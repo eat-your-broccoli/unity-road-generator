@@ -17,11 +17,12 @@ public class MenuTest : MonoBehaviour
     {
         Debug.Log("Checking if map data is available");
         GenerateMapData(@".\Assets\OSM\test-map.osm");
-        Debug.Log("Read the data");
+        Debug.Log("Done!");
     }
 
     private static void GenerateMapData(string filePath)
     {
+        CompleteWay[] completeWays;
         using (var fileStream = new FileInfo(filePath).OpenRead())
         {
             XmlOsmStreamSource source = new XmlOsmStreamSource(fileStream);
@@ -37,10 +38,13 @@ public class MenuTest : MonoBehaviour
             var ways = from osmGeo in completes
                        where osmGeo.Type == OsmSharp.OsmGeoType.Way
                        select osmGeo;
-            CompleteWay[] completeWays = ways.Cast<CompleteWay>().ToArray();
+            completeWays = ways.Cast<CompleteWay>().ToArray();
             Debug.Log("Parsed osm file");
             Debug.Log("There are " + completeWays.Length + " ways");
         }
+
+        OSM_Map_Generator generator = new OSM_Map_Generator();
+        generator.PlotMap(completeWays);
     }
 }
 
