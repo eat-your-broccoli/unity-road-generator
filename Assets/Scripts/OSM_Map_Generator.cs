@@ -11,11 +11,39 @@ public class OSM_Map_Generator
 {
     Scene scene;
     GameObject map;
+    
+    // coordinate offset in x direction
     double xOffset = 0f;
+    // coordinate offset in y direction
     double yOffset = 0f;
+
+    // plot size for all 
+    public float plotSize = 10f;
+    // multiplier for buildings
+    public float plotScaleBuilding = 0.2f;
+    // multiplier for ways
+    public float plotScaleWay = 1f;
+
+    // only plot named streets 
+    public bool plotOnlyNamedStreets = true;
+
+    public bool plotOnlyStreetsWithHighwayTag = true;
+    // plot with line renderer. if false plots with cubes
+    public bool plotWithLineRenderer = true;
+
+    public UnityEngine.Material matColorWhite;
+    public UnityEngine.Material matColorBlue;
+    public UnityEngine.Material matColorGreen;
+    public UnityEngine.Material matColorGrey;
+
+
 
     public OSM_Map_Generator()
     {
+        matColorWhite = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>("Assets/Materials/ColorWhite.mat");
+        matColorBlue = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>("Assets/Materials/ColorBlue.mat");
+        matColorGreen = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>("Assets/Materials/ColorGreen.mat");
+        matColorGrey = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>("Assets/Materials/ColorGrey.mat");
     }
 
     public void PlotMap(CompleteWay[] ways)
@@ -26,9 +54,6 @@ public class OSM_Map_Generator
         // EditorSceneManager.OpenScene(scene.path);
         map = new GameObject("map");
         DetermineOffset(ways);
-        Debug.Log(xOffset);
-        Debug.Log(yOffset);
-
 
         foreach (CompleteWay way in ways)
         {
@@ -55,8 +80,14 @@ public class OSM_Map_Generator
 
     private void PlotWay(CompleteWay way)
     {
+        string name = way?.Tags?.GetValue("name");
+        string highway = way?.Tags?.GetValue("highway");
+
+        if (plotOnlyNamedStreets && (name == null || name.Length == 0)) return;
+        if (plotOnlyStreetsWithHighwayTag && (highway == null || highway.Length == 0)) return;
         GameObject way_gobj = new GameObject(way?.Tags?.GetValue("name"));
         way_gobj.transform.parent = map.transform;
+
         List<GameObject> listOfNodes = new List<GameObject>();
         foreach (OsmSharp.Node node in way.Nodes)
         {
@@ -70,7 +101,15 @@ public class OSM_Map_Generator
                 listOfNodes.Add(wayNode);
             }
         }
-        PlotNodes(listOfNodes.ToArray());
+        if(plotWithLineRenderer)
+        {
+            if (name != null && name.Length > 0) PlotNodesWithLineRenderer(listOfNodes.ToArray(), matColorBlue);
+            else PlotNodesWithLineRenderer(listOfNodes.ToArray(), matColorGrey, plotScaleBuilding);
+        } else
+        {
+            PlotNodesWithCubes(listOfNodes.ToArray());
+        }
+        
     }
 
     private Vector3 LatLonToCoords(double lat, double lon)
@@ -82,15 +121,32 @@ public class OSM_Map_Generator
         return coords;
     }
 
-    private void PlotNodes(GameObject[] nodes)
+    private void PlotNodesWithCubes(GameObject[] nodes)
     {
-        foreach(GameObject gobj in nodes)
+        foreach (GameObject gobj in nodes)
         {
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.localScale = new Vector3(plotSize, plotSize, plotSize);
             cube.transform.position = gobj.transform.position;
             cube.transform.parent = gobj.transform;
         }
     }
 
+    private void PlotNodesWithLineRenderer(GameObject[] nodes, UnityEngine.Material material = null, float scale = 1f)
+    {
+        if (nodes.Length <= 2) return;
+        if (material == null) material = matColorWhite;
+
+        GameObject parent = nodes[0].transform.parent.gameObject;
+        LineRenderer lineRenderer = parent.AddComponent<LineRenderer>();
+        lineRenderer.positionCount = nodes.Length;
+        lineRenderer.widthMultiplier = plotSize * scale;
+        lineRenderer.material = material;
+
+        for (int i = 0; i < nodes.Length; i++)
+        {
+            lineRenderer.SetPosition(i, nodes[i].transform.position);
+        }
+    }
 
 }
