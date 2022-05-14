@@ -11,6 +11,8 @@ public class OSM_Map_Generator
 {
     Scene scene;
     GameObject map;
+
+    SRTM_Reader srtm;
     
     // coordinate offset in x direction
     double xOffset = 0f;
@@ -25,11 +27,13 @@ public class OSM_Map_Generator
     public float plotScaleWay = 1f;
 
     // only plot named streets 
-    public bool plotOnlyNamedStreets = true;
+    public bool plotOnlyNamedStreets = false;
 
-    public bool plotOnlyStreetsWithHighwayTag = true;
+    public bool plotOnlyStreetsWithHighwayTag = false;
     // plot with line renderer. if false plots with cubes
     public bool plotWithLineRenderer = true;
+
+    public bool useHeightmap = true;
 
     public UnityEngine.Material matColorWhite;
     public UnityEngine.Material matColorBlue;
@@ -53,6 +57,12 @@ public class OSM_Map_Generator
         scene.name = "Map";
         // EditorSceneManager.OpenScene(scene.path);
         map = new GameObject("map");
+
+        if (useHeightmap)
+        {
+            srtm = new SRTM_Reader("Assets/SRTM");
+        }
+
         DetermineOffset(ways);
 
         foreach (CompleteWay way in ways)
@@ -118,6 +128,11 @@ public class OSM_Map_Generator
         coords.x = (float) (MercatorProjection.lonToX(lon) - xOffset);
         // this isn't an error. in XYZ coordinate systems, Y is the height.
         coords.z = (float) (MercatorProjection.latToY(lat) - yOffset);
+
+        if(useHeightmap)
+        {
+            coords.y = srtm.GetElevationAtSync(lat, lon);
+        }
         return coords;
     }
 

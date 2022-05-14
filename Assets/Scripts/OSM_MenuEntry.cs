@@ -16,7 +16,7 @@ public class MenuTest : MonoBehaviour
     static void MenuItem()
     {
         Debug.Log("Checking if map data is available");
-        GenerateMapData(@".\Assets\OSM\test-map.osm");
+        GenerateMapData(@".\Assets\OSM\flein.osm");
         Debug.Log("Done!");
     }
 
@@ -45,6 +45,21 @@ public class MenuTest : MonoBehaviour
 
         OSM_Map_Generator generator = new OSM_Map_Generator();
         generator.PlotMap(completeWays);
+    }
+
+
+    // Add a menu item named "Do Something" to MyMenu in the menu bar.
+    [MenuItem("SRTM/load data")]
+    static void SRTM_MenuItem()
+    {
+
+        string filename = "Assets/SRTM";
+        SRTM_Reader srtm = new SRTM_Reader(filename);
+
+        Debug.Log(srtm.GetElevationAtSync(49.10094934f, 9.21450603f));
+        Debug.Log(srtm.GetElevationAtSync(49.21411973f, 9.2254717465f));
+        Debug.Log(srtm.GetElevationAtSync(49.10092f, 9.21411f));
+        Debug.Log(srtm.GetElevationAtSync(49.1204219f, 9.2139712f));
     }
 }
 
