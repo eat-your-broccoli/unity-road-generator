@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using OsmSharp.Streams;
 using OsmSharp.Complete;
+using OsmSharp.Geo.Streams.Features.Interpreted;
 
 public class MenuTest : MonoBehaviour
 {
@@ -26,9 +27,8 @@ public class MenuTest : MonoBehaviour
         using (var fileStream = new FileInfo(filePath).OpenRead())
         {
             XmlOsmStreamSource source = new XmlOsmStreamSource(fileStream);
-
-            // Get all building ways and nodes 
-            var tmp_ways = from osmGeo in source
+         // Get all building ways and nodes 
+         var tmp_ways = from osmGeo in source
                             where osmGeo.Type == OsmSharp.OsmGeoType.Node ||
                             (osmGeo.Type == OsmSharp.OsmGeoType.Way)
                             select osmGeo;
@@ -60,6 +60,29 @@ public class MenuTest : MonoBehaviour
         Debug.Log(srtm.GetElevationAtSync(49.21411973f, 9.2254717465f));
         Debug.Log(srtm.GetElevationAtSync(49.10092f, 9.21411f));
         Debug.Log(srtm.GetElevationAtSync(49.1204219f, 9.2139712f));
+    }
+
+
+    // Add a menu item named "Do Something" to MyMenu in the menu bar.
+    [MenuItem("OSM/generate Terrain")]
+    static void GenerateTerrain()
+    {
+        
+        float max_lat = 49.1117000f;
+        // float max_lat = 49.1017000f;
+        float min_lat = 49.0943000f;
+        float min_lon = 9.1985000f;
+        // float max_lon = 9.2060000f;
+        float max_lon = 9.2260000f;
+
+        Terrain_Generator terrainGen = new Terrain_Generator();
+        terrainGen.max_lat = max_lat;
+        terrainGen.min_lat = min_lat;
+        terrainGen.min_lon = min_lon;
+        terrainGen.max_lon = max_lon;
+
+        terrainGen.srtm = new SRTM_Reader("Assets/SRTM");
+        terrainGen.GenerateTerrain();
     }
 }
 

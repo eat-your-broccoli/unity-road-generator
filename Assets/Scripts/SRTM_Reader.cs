@@ -1,5 +1,6 @@
 using SRTM;
 using SRTM.Sources.USGS;
+using UnityEngine;
 
 public class SRTM_Reader
 {
@@ -12,6 +13,7 @@ public class SRTM_Reader
 
     public int GetElevationAtSync(double lat, double lon)
     {
-        return (int) heightMap.GetElevation(lat, lon);
+        double? x = heightMap.GetElevationBilinear(lat, lon);
+        return x.HasValue ? (int) x : 0;
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-public static class MercatorProjection
+public class MercatorProjection
 {
     private static readonly double R_MAJOR = 6378137.0;
     private static readonly double R_MINOR = 6356752.3142;
@@ -11,6 +11,7 @@ public static class MercatorProjection
     private static readonly double DEG2RAD = Math.PI / 180.0;
     private static readonly double RAD2Deg = 180.0 / Math.PI;
     private static readonly double PI_2 = Math.PI / 2.0;
+
 
     public static double[] toPixel(double lon, double lat)
     {
