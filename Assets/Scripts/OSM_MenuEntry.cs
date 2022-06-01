@@ -17,7 +17,7 @@ public class MenuTest : MonoBehaviour
     static void MenuItem()
     {
         Debug.Log("Checking if map data is available");
-        GenerateMapData(@".\Assets\OSM\flein.osm");
+        GenerateMapData(@".\Assets\OSM\flein_2.osm");
         Debug.Log("Done!");
     }
 

@@ -82,6 +82,6 @@ public class Terrain_Generator
     float CalculateHeight(int x, int y)
     {
         // return Mathf.PerlinNoise((float)x / width * 100, (float)y / width * 100);
-        return (float) ((float)srtm.GetElevationAtSync(mercator.yToLat(y), mercator.xToLon(x))) / (float) depth;
+        return (float) ((float)srtm.GetElevationAtSync(mercator.yToLat(y), mercator.xToLon(x))) / (float) height;
     }
 }
