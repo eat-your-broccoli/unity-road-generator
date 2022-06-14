@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-class LocalizedMercatorProjection
+public class LocalizedMercatorProjection
 {
     public float x_offset = 0f;
     public float y_offset = 0f;

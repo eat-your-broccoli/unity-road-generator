@@ -13,11 +13,12 @@ public class OSM_Map_Generator
     GameObject map;
 
     SRTM_Reader srtm;
-    
-    // coordinate offset in x direction
-    double xOffset = 0f;
-    // coordinate offset in y direction
-    double yOffset = 0f;
+
+    public float max_lat = 49.1117000f;
+    public float min_lat = 49.0943000f;
+    public float min_lon = 9.1985000f;
+    public float max_lon = 9.2260000f;
+
 
     // plot size for all 
     public float plotSize = 10f;
@@ -35,11 +36,16 @@ public class OSM_Map_Generator
 
     public bool useHeightmap = true;
 
+    public bool generateTerrain = true;
+
     public UnityEngine.Material matColorWhite;
     public UnityEngine.Material matColorBlue;
     public UnityEngine.Material matColorGreen;
     public UnityEngine.Material matColorGrey;
 
+    public Terrain_Generator terrainGenerator;
+
+    public LocalizedMercatorProjection mercator;
 
 
     public OSM_Map_Generator()
@@ -63,29 +69,32 @@ public class OSM_Map_Generator
             srtm = new SRTM_Reader("Assets/SRTM");
         }
 
+        mercator = new LocalizedMercatorProjection();
         DetermineOffset(ways);
 
         foreach (CompleteWay way in ways)
         {
             PlotWay(way);
         }
+
+        if(generateTerrain == true)
+        {
+            terrainGenerator = new Terrain_Generator();
+            terrainGenerator.mercator = mercator;
+            terrainGenerator.srtm = srtm;
+            terrainGenerator.max_lat = max_lat;
+            terrainGenerator.min_lat = min_lat;
+            terrainGenerator.max_lon = max_lon;
+            terrainGenerator.min_lon = min_lon;
+
+            terrainGenerator.GenerateTerrain();
+        }
     }
 
     private void DetermineOffset(CompleteWay[] ways)
     {
-        foreach (CompleteWay way in ways)
-        {
-            foreach (OsmSharp.Node node in way.Nodes)
-            {
-                if (node.Latitude.HasValue && node.Longitude.HasValue)
-                {
-                    xOffset = MercatorProjection.lonToX(node.Longitude ?? 0);
-                    yOffset = MercatorProjection.latToY(node.Latitude ?? 0);
-                    // stop when first node found
-                    return;
-                }
-            }
-        }
+        mercator.x_offset = (float)MercatorProjection.lonToX(min_lon);
+        mercator.y_offset = (float)MercatorProjection.latToY(min_lat);
     }
 
     private void PlotWay(CompleteWay way)
@@ -125,9 +134,9 @@ public class OSM_Map_Generator
     private Vector3 LatLonToCoords(double lat, double lon)
     {
         Vector3 coords = new Vector3();
-        coords.x = (float) (MercatorProjection.lonToX(lon) - xOffset);
+        coords.x = (float) (mercator.lonToX(lon));
         // this isn't an error. in XYZ coordinate systems, Y is the height.
-        coords.z = (float) (MercatorProjection.latToY(lat) - yOffset);
+        coords.z = (float) (mercator.latToY(lat));
 
         if(useHeightmap)
         {
