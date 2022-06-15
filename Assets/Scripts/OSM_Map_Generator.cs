@@ -36,9 +36,9 @@ public class OSM_Map_Generator
 
     public bool useHeightmap = true;
 
-    public bool generateTerrain = true;
-    public bool generateRoads = false;
-
+    public bool generateTerrain = false;
+    public bool generateRoads = true;
+    public bool newScene = false;
 
     public UnityEngine.Material matColorWhite;
     public UnityEngine.Material matColorBlue;
@@ -61,8 +61,14 @@ public class OSM_Map_Generator
     public void PlotMap(CompleteWay[] ways)
     {
         Debug.Log("plotting the ways");
-        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
-        scene.name = "Map";
+        if(newScene == true)
+        {
+            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            scene.name = "Map";
+        } else
+        {
+            scene = EditorSceneManager.GetActiveScene();
+        }
 
         mercator = new LocalizedMercatorProjection();
         DetermineOffset(ways);

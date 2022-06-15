@@ -27,11 +27,11 @@ public class MenuTest : MonoBehaviour
         using (var fileStream = new FileInfo(filePath).OpenRead())
         {
             XmlOsmStreamSource source = new XmlOsmStreamSource(fileStream);
-         // Get all building ways and nodes 
-         var tmp_ways = from osmGeo in source
-                            where osmGeo.Type == OsmSharp.OsmGeoType.Node ||
-                            (osmGeo.Type == OsmSharp.OsmGeoType.Way)
-                            select osmGeo;
+            // Get all building ways and nodes 
+            var tmp_ways = from osmGeo in source
+                           where osmGeo.Type == OsmSharp.OsmGeoType.Node ||
+                           (osmGeo.Type == OsmSharp.OsmGeoType.Way)
+                           select osmGeo;
 
             // Should filter before calling ToComplete() to reduce memory usage
             var completes = tmp_ways.ToComplete(); // Create Complete objects (for Ways gives them a list of Node objects)
@@ -67,7 +67,7 @@ public class MenuTest : MonoBehaviour
     [MenuItem("OSM/generate Terrain")]
     static void GenerateTerrain()
     {
-        
+
         float max_lat = 49.1117000f;
         // float max_lat = 49.1017000f;
         float min_lat = 49.0943000f;
@@ -83,6 +83,45 @@ public class MenuTest : MonoBehaviour
 
         terrainGen.srtm = new SRTM_Reader("Assets/SRTM");
         terrainGen.GenerateTerrain();
+    }
+
+
+    [MenuItem("OSM/test")]
+    static void TestFunc()
+    {
+        float[,] heights = new float[7, 10];
+        int yDim = heights.GetLength(0);
+        int xDim = heights.GetLength(1);
+
+        for (int y = 0; y < yDim - 1; y++)
+        {
+            for (int x = 0; x < xDim - 1; x++)
+            {
+                heights[y, x] = y % 2 == x % 2 ? 1 : 0;
+            }
+        }
+
+        float[,] blurredHeights = TerrainBlur.blur(heights, 13);
+        printArray(heights);
+        Debug.Log("---");
+        printArray(blurredHeights);
+    }
+
+    static void printArray(float[,] a)
+    {
+        int yDim = a.GetLength(0);
+        int xDim = a.GetLength(1);
+
+        
+        for (int y = 0; y < yDim; y++)
+        {
+            string s = "";
+            for (int x = 0; x < xDim; x++)
+            {
+                s += " " + a[y, x];
+            }
+            Debug.Log(s);
+        }
     }
 }
 

@@ -11,6 +11,8 @@ public class Terrain_Generator
     public int width = 0;
     public int height = 300;
     public float scale = 30f;
+    public int blurKernelSize = 13;
+    public bool blurTerrain = true;
 
     public Terrain terrain;
     public TerrainCollider terrainCollider;
@@ -46,7 +48,7 @@ public class Terrain_Generator
     {
         ConfigureTerrainData();
         float[,] heights = GenerateTerrainData();
-        heights = TerrainBlur.blur(heights);
+        if(blurTerrain == true) heights = TerrainBlur.blur(heights, this.blurKernelSize);
         terrain.terrainData.SetHeights(0, 0, heights);
     }
 
@@ -55,8 +57,8 @@ public class Terrain_Generator
         this.depth = Math.Abs(Convert.ToInt32(mercator.latToY(max_lat) - mercator.latToY(min_lat)));
         this.width = Math.Abs(Convert.ToInt32(mercator.lonToX(max_lon) - mercator.lonToX(min_lon)));
         // hard coding to mitigate sub-area terrain problem
-        this.depth = 400;
-        this.width = 400;
+        this.depth = 4097;
+        this.width = 4097;
         this.height = 400;
 
         this.terrain.terrainData.heightmapResolution = width + 1;

@@ -7,28 +7,35 @@ using UnityEngine;
 
 static class TerrainBlur
 {
-    public static float[,] blur(float[,] terrainData)
+    public static float[,] blur(float[,] terrainData, int kernelSize = 3)
     {
+        if (kernelSize % 2 == 0) throw new Exception("kernelSize must be uneven");
+        int kernel = (kernelSize - 1) / 2;
         int xDim = terrainData.GetLength(1);
         int yDim = terrainData.GetLength(0);
         float[,] blurredTerrain = new float[yDim, xDim];
-
-        for(int y = 1; y < yDim - 1; y++)
+        
+        for(int y = 0; y < yDim; y++)
         {
-            for (int x = 1; x < xDim - 1; x++)
+            for (int x = 0; x < xDim; x++)
             {
                 float blurred = 0;
-                blurred += terrainData[y, x];
-                blurred += terrainData[y+1, x];
-                blurred += terrainData[y, x+1];
-                blurred += terrainData[y-1, x];
-                blurred += terrainData[y, x-1];
+                int yClampLow = Mathf.Clamp(y - kernel, 0, yDim - 1);
+                int yClampHigh = Mathf.Clamp(y + kernel, 0, yDim - 1);
+                int xClampLow = Mathf.Clamp(x - kernel, 0, xDim - 1);
+                int xClampHigh = Mathf.Clamp(x + kernel, 0, xDim - 1);
 
-                blurredTerrain[y, x] = (blurred / 5);
+                int numFields = (yClampHigh - yClampLow) * (xClampHigh - xClampLow);
+                for (int i = yClampLow; i <= yClampHigh; i++)
+                {
+                    for (int j = xClampLow; j <= xClampHigh; j++)
+                    {
+                        blurred += terrainData[i, j] / numFields;
+                    }
+                }
+                blurredTerrain[y, x] = blurred;
             }
         }
-
-
         return blurredTerrain;
     }
 }
