@@ -10,18 +10,16 @@ public class Terrain_Generator
     public int depth = 10;
     public int width = 0;
     public int height = 300;
-    public float scale = 30f;
     public int blurKernelSize = 13;
-    public bool blurTerrain = true;
 
     public Terrain terrain;
     public TerrainCollider terrainCollider;
     public Scene scene;
 
-    public float max_lat = 0f;
-    public float max_lon = 0f;
-    public float min_lon = 0f;
-    public float min_lat = 0f;
+    // public float max_lat = 0f;
+    // public float max_lon = 0f;
+    // public float min_lon = 0f;
+    // public float min_lat = 0f;
 
     public LocalizedMercatorProjection mercator;
     public SRTM_Reader srtm;
@@ -48,14 +46,13 @@ public class Terrain_Generator
     {
         ConfigureTerrainData();
         float[,] heights = GenerateTerrainData();
-        if(blurTerrain == true) heights = TerrainBlur.blur(heights, this.blurKernelSize);
         terrain.terrainData.SetHeights(0, 0, heights);
     }
 
     void ConfigureTerrainData()
     {
-        this.depth = Math.Abs(Convert.ToInt32(mercator.latToY(max_lat) - mercator.latToY(min_lat)));
-        this.width = Math.Abs(Convert.ToInt32(mercator.lonToX(max_lon) - mercator.lonToX(min_lon)));
+        //this.depth = Math.Abs(Convert.ToInt32(mercator.latToY(max_lat) - mercator.latToY(min_lat)));
+        //this.width = Math.Abs(Convert.ToInt32(mercator.lonToX(max_lon) - mercator.lonToX(min_lon)));
         // hard coding to mitigate sub-area terrain problem
         this.depth = 4097;
         this.width = 4097;

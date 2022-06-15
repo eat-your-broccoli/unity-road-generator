@@ -29,4 +29,10 @@ public class LocalizedMercatorProjection
     {
         return MercatorProjection.yToLat(y + y_offset);
     }
+
+    public void CalcAndSetOffset(float min_lat, float min_lon)
+    {
+        this.x_offset = (float)MercatorProjection.lonToX(min_lon);
+        this.y_offset = (float)MercatorProjection.latToY(min_lat);
+    }
 }

@@ -6,18 +6,18 @@ using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using OsmSharp.Complete;
 using System.Linq;
+using OsmSharp.Streams;
+using System.IO;
 
 public class OSM_Map_Generator
 {
     Scene scene;
     GameObject map;
 
-    SRTM_Reader srtm;
-
-    public float max_lat = 49.1117000f;
-    public float min_lat = 49.0943000f;
-    public float min_lon = 9.1985000f;
-    public float max_lon = 9.2260000f;
+    public SRTM_Reader srtm;
+    public LocalizedMercatorProjection mercator;
+    public TerrainHeightInfo terrainHeight;
+    public bool useTerrainHeight = true; // use terrainHeight instead of SRTM
 
 
     // plot size for all 
@@ -36,19 +36,14 @@ public class OSM_Map_Generator
 
     public bool useHeightmap = true;
 
-    public bool generateTerrain = false;
-    public bool generateRoads = true;
+    public bool generateTerrain = true;
+    public bool generateRoads = false;
     public bool newScene = false;
 
     public UnityEngine.Material matColorWhite;
     public UnityEngine.Material matColorBlue;
     public UnityEngine.Material matColorGreen;
     public UnityEngine.Material matColorGrey;
-
-    public Terrain_Generator terrainGenerator;
-
-    public LocalizedMercatorProjection mercator;
-
 
     public OSM_Map_Generator()
     {
@@ -58,49 +53,35 @@ public class OSM_Map_Generator
         matColorGrey = AssetDatabase.LoadAssetAtPath<UnityEngine.Material>("Assets/Materials/ColorGrey.mat");
     }
 
-    public void PlotMap(CompleteWay[] ways)
+    public void PlotMap(string filePath)
     {
-        Debug.Log("plotting the ways");
-        if(newScene == true)
+        CompleteWay[] completeWays;
+        using (var fileStream = new FileInfo(filePath).OpenRead())
         {
-            Scene scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
-            scene.name = "Map";
-        } else
-        {
-            scene = EditorSceneManager.GetActiveScene();
+            XmlOsmStreamSource source = new XmlOsmStreamSource(fileStream);
+            // Get all building ways and nodes 
+            var tmp_ways = from osmGeo in source
+                           where osmGeo.Type == OsmSharp.OsmGeoType.Node ||
+                           (osmGeo.Type == OsmSharp.OsmGeoType.Way)
+                           select osmGeo;
+
+            // Should filter before calling ToComplete() to reduce memory usage
+            var completes = tmp_ways.ToComplete(); // Create Complete objects (for Ways gives them a list of Node objects)
+            var ways = from osmGeo in completes
+                       where osmGeo.Type == OsmSharp.OsmGeoType.Way
+                       select osmGeo;
+            completeWays = ways.Cast<CompleteWay>().ToArray();
         }
-
-        mercator = new LocalizedMercatorProjection();
-        DetermineOffset(ways);
-        srtm = new SRTM_Reader("Assets/SRTM");
-
-        if (generateRoads == true)
-        {
-            map = new GameObject("map");
-            foreach (CompleteWay way in ways)
-            {
-                PlotWay(way);
-            }
-        }
-
-        if(generateTerrain == true)
-        {
-            terrainGenerator = new Terrain_Generator();
-            terrainGenerator.mercator = mercator;
-            terrainGenerator.srtm = srtm;
-            terrainGenerator.max_lat = max_lat;
-            terrainGenerator.min_lat = min_lat;
-            terrainGenerator.max_lon = max_lon;
-            terrainGenerator.min_lon = min_lon;
-
-            terrainGenerator.GenerateTerrain();
-        }
+        PlotMap(completeWays);
     }
 
-    private void DetermineOffset(CompleteWay[] ways)
+    public void PlotMap(CompleteWay[] ways)
     {
-        mercator.x_offset = (float)MercatorProjection.lonToX(min_lon);
-        mercator.y_offset = (float)MercatorProjection.latToY(min_lat);
+        map = new GameObject("map");
+        foreach (CompleteWay way in ways)
+        {
+            PlotWay(way);
+        }
     }
 
     private void PlotWay(CompleteWay way)
@@ -146,7 +127,8 @@ public class OSM_Map_Generator
 
         if(useHeightmap)
         {
-            coords.y = srtm.GetElevationAtSync(lat, lon);
+            if (useTerrainHeight) coords.y = terrainHeight.GetHeightAtCoords((int) coords.x, (int) coords.z);
+            else coords.y = srtm.GetElevationAtSync(lat, lon);
         }
         return coords;
     }

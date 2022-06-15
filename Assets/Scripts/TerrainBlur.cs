@@ -25,14 +25,17 @@ static class TerrainBlur
                 int xClampLow = Mathf.Clamp(x - kernel, 0, xDim - 1);
                 int xClampHigh = Mathf.Clamp(x + kernel, 0, xDim - 1);
 
-                int numFields = (yClampHigh - yClampLow) * (xClampHigh - xClampLow);
+                int numFields = 0;
+                // int numFields = (yClampHigh - yClampLow) * (xClampHigh - xClampLow);
                 for (int i = yClampLow; i <= yClampHigh; i++)
                 {
                     for (int j = xClampLow; j <= xClampHigh; j++)
                     {
-                        blurred += terrainData[i, j] / numFields;
+                        blurred += terrainData[i, j];
+                        numFields++;
                     }
                 }
+                blurred = blurred / (float) numFields;
                 blurredTerrain[y, x] = blurred;
             }
         }
