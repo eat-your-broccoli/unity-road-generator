@@ -4,6 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/**
+ * @class LocalizedMercatorProjection
+ * 
+ * mercator projection for converting between lat,lon and x,y
+ * can set an offset for limiting the values returned, improving float precision
+ */
 
 public class LocalizedMercatorProjection
 {

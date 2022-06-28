@@ -2,6 +2,13 @@ using SRTM;
 using SRTM.Sources.USGS;
 using UnityEngine;
 
+
+/**
+ * @class SRTM_Reader
+ * 
+ * wrapper for SRTM class
+ * provides height data
+ */ 
 public class SRTM_Reader
 {
     public SRTMData heightMap;

@@ -5,6 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/**
+ * @class TerrainBlur
+ * 
+ * blurs terrain data using a kernel function
+ */ 
 static class TerrainBlur
 {
     public static float[,] blur(float[,] terrainData, int kernelSize = 3)
@@ -26,7 +31,6 @@ static class TerrainBlur
                 int xClampHigh = Mathf.Clamp(x + kernel, 0, xDim - 1);
 
                 int numFields = 0;
-                // int numFields = (yClampHigh - yClampLow) * (xClampHigh - xClampLow);
                 for (int i = yClampLow; i <= yClampHigh; i++)
                 {
                     for (int j = xClampLow; j <= xClampHigh; j++)

@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
+/**
+ * @class MapGenerator
+ * 
+ * parent for all other generators
+ */
 
 public class MapGenerator
 {
@@ -20,9 +25,13 @@ public class MapGenerator
     public float min_lon = 9.1985000f;
     public float max_lon = 9.2260000f;
 
+    // should a new scene be created?
     public bool newScene = false;
+    // should terrain be generated?
     public bool generateTerrain = true;
+    // should roads be generated?
     public bool generateRoads = false;
+    // kernel sizes for blurring
     public int[] terrainBlurKernels;
 
     public void GenerateMap()
@@ -58,6 +67,7 @@ public class MapGenerator
 
         if(terrainBlurKernels != null && terrainBlurKernels.Length > 0)
         {
+            // for each blur kernel, perform blurring
             var data = terrainGen.terrain.terrainData;
             var heights = data.GetHeights(0, 0, (int)data.size.x, (int)data.size.z);
             foreach ( int kernel in terrainBlurKernels)
@@ -69,6 +79,7 @@ public class MapGenerator
 
         if(generateRoads == true)
         {
+            // wrap terrain in terrainHeightInfo
             TerrainHeightInfo terrainHeight = new TerrainHeightInfo(terrainGen.terrain);
             osmGen = new OSM_Map_Generator();
             osmGen.terrainHeight = terrainHeight;

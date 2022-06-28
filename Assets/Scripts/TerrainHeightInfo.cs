@@ -5,7 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-
+/**
+ * @class TerrainHeightInfo
+ * 
+ * Wrapper around a terrain, offers API to easily read height info from terrain data
+ */ 
 public class TerrainHeightInfo
 {
     Terrain terrain;

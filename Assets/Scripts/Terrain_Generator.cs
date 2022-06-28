@@ -5,21 +5,21 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using System;
+
+/**
+ * @class Terrain_Generator
+ * 
+ * generates Terrain from SRTM_data
+ */
 public class Terrain_Generator
 {
-    public int depth = 10;
-    public int width = 0;
+    public int depth = 4097;
+    public int width = 4097;
     public int height = 300;
-    public int blurKernelSize = 13;
 
     public Terrain terrain;
     public TerrainCollider terrainCollider;
     public Scene scene;
-
-    // public float max_lat = 0f;
-    // public float max_lon = 0f;
-    // public float min_lon = 0f;
-    // public float min_lat = 0f;
 
     public LocalizedMercatorProjection mercator;
     public SRTM_Reader srtm;
@@ -51,9 +51,6 @@ public class Terrain_Generator
 
     void ConfigureTerrainData()
     {
-        //this.depth = Math.Abs(Convert.ToInt32(mercator.latToY(max_lat) - mercator.latToY(min_lat)));
-        //this.width = Math.Abs(Convert.ToInt32(mercator.lonToX(max_lon) - mercator.lonToX(min_lon)));
-        // hard coding to mitigate sub-area terrain problem
         this.depth = 4097;
         this.width = 4097;
         this.height = 400;
@@ -77,7 +74,6 @@ public class Terrain_Generator
 
     float CalculateHeight(int x, int y)
     {
-        // return Mathf.PerlinNoise((float)x / width * 100, (float)y / width * 100);
         float elevation = srtm.GetElevationAtSync(mercator.yToLat(y), mercator.xToLon(x));
         if (elevation >= height) return 1.0f;
         return elevation / height;

@@ -9,6 +9,12 @@ using System.Linq;
 using OsmSharp.Streams;
 using System.IO;
 
+
+/**
+ * @class OSM_Map_Generator
+ * 
+ * draws road from OSM data
+ */
 public class OSM_Map_Generator
 {
     Scene scene;

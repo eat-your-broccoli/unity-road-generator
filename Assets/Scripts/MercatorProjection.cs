@@ -1,5 +1,12 @@
 using System;
 
+/**
+ * @class MercatorProjection
+ * 
+ * static projection without offsets
+ * taken from 
+ * 
+ */
 public class MercatorProjection
 {
     private static readonly double R_MAJOR = 6378137.0;
