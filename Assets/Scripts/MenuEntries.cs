@@ -29,6 +29,11 @@ public class MenuEntries : MonoBehaviour
         gen.terrainBlurKernels = new int[] {3, 13 };
         gen.generateRoads = true;
         gen.generateTerrain = true;
+        gen.osmPath = @".\Assets\OSM\flein_2.osm";
+        gen.max_lat = 49.1117000f;
+        gen.min_lat = 49.0943000f;
+        gen.min_lon = 9.1985000f;
+        gen.max_lon = 9.2260000f;
         gen.GenerateMap();
         Debug.Log("Done!");
     }

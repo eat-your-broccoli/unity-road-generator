@@ -18,6 +18,9 @@ public class MapGenerator
     SRTM_Reader srtm;
     Terrain_Generator terrainGen;
     OSM_Map_Generator osmGen;
+    
+    // osm map file
+    public String osmPath = @".\Assets\OSM\flein_2.osm";
 
     // bounds of map
     public float max_lat = 49.1117000f;
@@ -86,7 +89,7 @@ public class MapGenerator
             osmGen.useTerrainHeight = true;
             osmGen.mercator = mercator;
             osmGen.srtm = srtm;
-            osmGen.PlotMap(@".\Assets\OSM\flein_2.osm");
+            osmGen.PlotMap(osmPath);
         }
     }
 }
